@@ -53,7 +53,6 @@ pub fn main() void {
         .height = 640,
         .window_title = "SML Web Visualizer",
         .icon = .{ .sokol_default = true },
-        .depth_format = .NONE,
 
         .logger = .{ .func = slog.func },
         .win32 = .{ .console_attach = true },

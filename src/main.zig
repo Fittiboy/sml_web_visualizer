@@ -56,7 +56,12 @@ export fn init() void {
 
     state.pass_action.colors[0] = .{
         .load_action = .CLEAR,
-        .clear_value = .{ .r = 0.0, .g = 0.5, .b = 1.0, .a = 1.0 },
+        .clear_value = .{
+            .r = 30.0 / 255.0,
+            .g = 40.0 / 255.0,
+            .b = 80.0 / 255.0,
+            .a = 1.0,
+        },
     };
 
     std.debug.print("Sokol backend: {}\n", .{sg.queryBackend()});

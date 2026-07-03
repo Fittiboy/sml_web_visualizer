@@ -13,11 +13,42 @@ const state = struct {
     var show_second_window: bool = true;
 };
 
+const roboto_medium_ttf = @embedFile("assets/fonts/Roboto-Medium.ttf");
+
+fn fontConfigForEmbeddedStaticData() ig.ImFontConfig {
+    var cfg = std.mem.zeroes(ig.ImFontConfig);
+
+    cfg.FontDataOwnedByAtlas = false; // do not let ImGui free @embedFile memory
+    cfg.GlyphMaxAdvanceX = std.math.floatMax(f32);
+    cfg.RasterizerMultiply = 1.0;
+    cfg.RasterizerDensity = 1.0;
+    cfg.ExtraSizeScale = 1.0;
+
+    if (@hasField(ig.ImFontConfig, "PixelSnapV")) {
+        cfg.PixelSnapV = true;
+    }
+
+    return cfg;
+}
+
 export fn init() void {
     sg.setup(.{
         .environment = sglue.environment(),
     });
-    simgui.setup(.{});
+    simgui.setup(.{
+        .no_default_font = true,
+    });
+
+    const io = ig.igGetIO();
+    var cfg = fontConfigForEmbeddedStaticData();
+    _ = ig.ImFontAtlas_AddFontFromMemoryTTF(
+        io.*.Fonts,
+        @ptrCast(@constCast(roboto_medium_ttf.ptr)),
+        @intCast(roboto_medium_ttf.len),
+        18.0,
+        &cfg,
+        null,
+    ) orelse @panic("failed to load embedded Roboto Medium");
 
     if (build_options.docking) {
         ig.igGetIO().*.ConfigFlags |= ig.ImGuiConfigFlags_DockingEnable;

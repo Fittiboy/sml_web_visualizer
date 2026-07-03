@@ -1,0 +1,60 @@
+name: Deploy web build to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.0-dev.39+d092c752f
+          mirror: 'https://zigmirror.hryx.net/zig/'
+
+      - name: Build Emscripten target
+        run: |
+          zig build --release=small -Dtarget=wasm32-emscripten
+
+      - name: Prepare Pages directory
+        run: |
+          mkdir -p public
+          cp -r zig-out/web/* public/
+
+          if [ -f public/sml_web_visualizer.html ]; then
+            cp public/sml_web_visualizer.html public/index.html
+          fi
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: public
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

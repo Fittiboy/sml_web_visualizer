@@ -9,7 +9,7 @@ pub fn build(b: *Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const opt_docking = b.option(bool, "docking", "Build with docking support") orelse false;
+    const opt_docking = b.option(bool, "docking", "Build with docking support") orelse true;
     const cimgui_conf = cimgui.getConfig(opt_docking);
 
     const dep_sokol = b.dependency("sokol", .{

@@ -55,6 +55,9 @@ export fn frame() void {
     }
     ig.igEnd();
 
+    var show_demo: bool = true;
+    ig.igShowDemoWindow(&show_demo);
+
     sg.beginPass(.{ .action = state.pass_action, .swapchain = sglue.swapchain() });
     simgui.render();
     sg.endPass();

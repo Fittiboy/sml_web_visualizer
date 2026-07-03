@@ -3,15 +3,15 @@
     .version = "0.0.1",
     .dependencies = .{
         .sokol = .{
-            .url = "git+https://github.com/floooh/sokol-zig.git#fc8dcc657ee7d5c9106c3c000d14be88b4ea87f9",
-            .hash = "sokol-0.1.0-pb1HKxrKNwAfEuu5wEOJo8yYNxmbsqa88hcjQ7A0NIYa",
+            .url = "git+https://github.com/floooh/sokol-zig.git#c0d1c3b780bfe01db65b4aa4720a8e06e6db3fca",
+            .hash = "sokol-0.1.0-pb1HK--6NwD5LC8pQDFz_oLbIrqs323BHW8VvMvMXLQp",
         },
         .cimgui = .{
-            .url = "git+https://github.com/floooh/dcimgui.git#3c2b41a9333b1195e2c2f8ce6a2d3e50660a73bf",
-            .hash = "cimgui-0.1.0-44ClkR8dmgDqqnfloyLE1bUAtl4zSKTT1wxaHSEC0ikV",
+            .url = "git+https://github.com/floooh/dcimgui.git#f276b9ce0d03004916441daa28504c686cd37ecc",
+            .hash = "cimgui-0.1.0-44ClkYTzmADm6eGNBxjzuN3nSFGCEoMTMorHcoR_-LJs",
         },
     },
-    .minimum_zig_version = "0.17.0-dev.387+31f157d80",
+    .minimum_zig_version = "0.17.0-dev.39+d092c752f",
     .paths = .{""},
     .fingerprint = 0x633697b702fb830e,
 }

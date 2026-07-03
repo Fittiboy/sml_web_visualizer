@@ -76,6 +76,8 @@ export fn frame() void {
     });
 
     // Now do ImGui stuff here!!
+    ig.igSetNextWindowPos(.{ .x = 10, .y = 30 }, ig.ImGuiCond_Once);
+    ig.igSetNextWindowSize(.{ .x = 400, .y = 100 }, ig.ImGuiCond_Once);
     if (ig.igBegin("Hello Dear ImGui!", &state.show_first_window, ig.ImGuiWindowFlags_None)) {
         _ = ig.igColorEdit3("Background", &state.pass_action.colors[0].clear_value.r, ig.ImGuiColorEditFlags_None);
         _ = ig.igText("Dear ImGui Version: %s", ig.IMGUI_VERSION);

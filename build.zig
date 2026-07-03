@@ -9,7 +9,8 @@ pub fn build(b: *Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const cimgui_conf = cimgui.getConfig(false);
+    const opt_docking = b.option(bool, "docking", "Build with docking support") orelse true;
+    const cimgui_conf = cimgui.getConfig(opt_docking);
 
     const dep_sokol = b.dependency("sokol", .{
         .target = target,
@@ -33,15 +34,19 @@ pub fn build(b: *Build) void {
     mod_main.addImport("sokol", dep_sokol.module("sokol"));
     mod_main.addImport(cimgui_conf.module_name, dep_cimgui.module(cimgui_conf.module_name));
 
-    // if (target.result.cpu.arch.isWasm()) {
-    //     try buildWasm(b, .{
-    //         .mod_main = mod_main,
-    //         .dep_sokol = dep_sokol,
-    //     });
-    // }
+    if (target.result.cpu.arch.isWasm()) {
+        try buildWasm(b, .{
+            .mod_main = mod_main,
+            .dep_sokol = dep_sokol,
+            .dep_cimgui = dep_cimgui,
+            .cimgui_clib_name = cimgui_conf.clib_name,
+        });
+    } else buildNative(b, mod_main);
+}
 
+fn buildNative(b: *Build, mod_main: *Build.Module) void {
     const exe = b.addExecutable(.{
-        .name = "sml_web_visualizer",
+        .name = "sml_native_visualizer",
         .root_module = mod_main,
         .use_llvm = true,
         .use_lld = true,
@@ -57,16 +62,40 @@ pub fn build(b: *Build) void {
     run_step.dependOn(&run.step);
 }
 
-// const BuildWasmOptions = struct {
-//     mod_main: *Build.Module,
-//     dep_sokol: *Dependency,
-// };
-//
-// fn buildWasm(b: *Build, opts: BuildWasmOptions) !void {
-//     const lib = b.addLibrary(.{
-//         .name = "visualization",
-//         .root_module = opts.mod_main,
-//     });
-//
-//     const dep_emsdk
-// }
+const BuildWasmOptions = struct {
+    mod_main: *Build.Module,
+    dep_sokol: *Dependency,
+    dep_cimgui: *Dependency,
+    cimgui_clib_name: []const u8,
+};
+
+fn buildWasm(b: *Build, opts: BuildWasmOptions) !void {
+    const visualizer = b.addLibrary(.{
+        .name = "sml_web_visualizer",
+        .root_module = opts.mod_main,
+    });
+
+    const dep_emsdk = opts.dep_sokol.builder.dependency("emsdk", .{});
+
+    const emsdk_incl_path = dep_emsdk.path("upstream/emscripten/cache/sysroot/include");
+    opts.dep_cimgui.artifact(opts.cimgui_clib_name).root_module.addSystemIncludePath(emsdk_incl_path);
+
+    opts.dep_cimgui.artifact(opts.cimgui_clib_name).step.dependOn(&opts.dep_sokol.artifact("sokol_clib").step);
+
+    const link_step = try sokol.emLinkStep(b, .{
+        .lib_main = visualizer,
+        .target = opts.mod_main.resolved_target.?,
+        .optimize = opts.mod_main.optimize.?,
+        .emsdk = dep_emsdk,
+        .use_webgl2 = true,
+        .use_emmalloc = true,
+        .shell_file_path = opts.dep_sokol.path("src/sokol/web/shell.html"),
+    });
+
+    b.getInstallStep().dependOn(&link_step.step);
+
+    const run_step = b.step("run", "Run the web version");
+    const run = sokol.emRunStep(b, .{ .name = "sml_web_visualizer", .emsdk = dep_emsdk });
+    run.step.dependOn(&link_step.step);
+    run_step.dependOn(&run.step);
+}

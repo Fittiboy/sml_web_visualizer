@@ -51,7 +51,7 @@ export fn init() void {
     ) orelse @panic("failed to load embedded Roboto Medium");
 
     if (build_options.docking) {
-        ig.igGetIO().*.ConfigFlags |= ig.ImGuiConfigFlags_DockingEnable;
+        io.*.ConfigFlags |= ig.ImGuiConfigFlags_DockingEnable;
     }
 
     state.pass_action.colors[0] = .{

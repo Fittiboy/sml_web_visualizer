@@ -74,17 +74,8 @@ export fn frame() void {
         .delta_time = sapp.frameDuration(),
         .dpi_scale = sapp.dpiScale(),
     });
-    var window_class = std.mem.zeroes(ig.ImGuiWindowClass);
-    const dock_id = ig.igDockSpaceOverViewportEx(
-        0,
-        ig.igGetMainViewport(),
-        ig.ImGuiDockNodeFlags_PassthruCentralNode | ig.ImGuiDockNodeFlags_AutoHideTabBar | ig.ImGuiDockNodeFlags_NoUndocking,
-        &window_class,
-    );
 
     // Now do ImGui stuff here!!
-    ig.igSetNextWindowDockID(dock_id, ig.ImGuiCond_Once);
-    ig.igSetNextWindowBgAlpha(0);
     if (ig.igBegin("Hello Dear ImGui!", &state.show_first_window, ig.ImGuiWindowFlags_None)) {
         _ = ig.igColorEdit3("Background", &state.pass_action.colors[0].clear_value.r, ig.ImGuiColorEditFlags_None);
         _ = ig.igText("Dear ImGui Version: %s", ig.IMGUI_VERSION);

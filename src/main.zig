@@ -117,9 +117,12 @@ pub fn main() void {
 
         .width = 960,
         .height = 640,
-        .window_title = "SML Web Visualizer",
+        .window_title = "SML",
         .icon = .{ .sokol_default = true },
 
         .win32 = .{ .console_attach = true },
+        .html5 = .{
+            .update_document_title = true,
+        },
     });
 }
